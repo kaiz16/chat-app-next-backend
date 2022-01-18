@@ -1,15 +1,17 @@
 const Mongoose = require("mongoose");
-const Conversation = mongoose.model(
-  "conversation",
-  new mongoose.Schema(
+
+const Conversation = Mongoose.model(
+  "conversations",
+  new Mongoose.Schema(
     {
-      userName: { type: String, required: true },
-      text: { type: String, required: true },
+      name: { type: String, required: true },
+      participants: [{ type: Mongoose.Schema.Types.ObjectId, ref: "users" }],
+      creator: { type: Mongoose.Schema.Types.ObjectId, ref: "users" },
     },
     {
       timestamps: true,
     }
   )
 );
-// Exporting the message model.
-module.exports = messages;
+
+module.exports = Conversation;

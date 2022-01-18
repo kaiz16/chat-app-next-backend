@@ -1,18 +1,11 @@
-const MongoDB = require("../MongoDB");
-const User = require("./CollectionUser");
-const Conversation = require("./CollectionConversation");
+const DB = require("../Mongoose");
 
-const create = async () => {
-  await MongoDB.Connect();
-  const DB = MongoDB.database;
-  try {
-    await DB.dropCollection(User.collectionName);
-    await DB.dropCollection(Conversation.collectionName);
-  } catch (error) {
-    console.error(error);
-  }
-
-  await MongoDB.Close();
+const drop = async () => {
+  await DB.Connect();
+  await DB.mongoose.connection.db.dropCollection("users");
+  await DB.mongoose.connection.db.dropCollection("conversations");
+  await DB.mongoose.connection.db.dropCollection("messages");
+  await DB.Close();
 };
 
-create();
+drop();

@@ -8,6 +8,7 @@ router.get("/", async (req, res) => {
   try {
     // Query users without password field
     const Users = await Collection.find({}, { password: 0 });
+
     res.status(200).json(Users);
   } catch (error) {
     res.status(400).json("Error querying users");
@@ -24,6 +25,7 @@ router.get("/:username", async (req, res) => {
 
     // Query user without password field
     const User = await Collection.findOne({ username }, { password: 0 });
+
     res.status(200).json(User);
   } catch (error) {
     res.status(400).json("Error querying user");
@@ -38,12 +40,15 @@ router.post("/register", async (req, res) => {
     if (!name) {
       throw "Name is needed";
     }
+
     if (!username) {
       throw "Username is needed";
     }
+
     if (!email) {
       throw "Email is needed";
     }
+
     if (!password) {
       throw "Password is needed";
     }
@@ -52,17 +57,26 @@ router.post("/register", async (req, res) => {
     const Hash = await generateHash(password);
 
     // Create & store user in the db
-    const User = new Collection({
+    const Response = new Collection({
       name,
       username,
       email,
       password: Hash,
     });
-    await User.save();
 
-    // Remove password field
-    delete User.password;
-    res.status(200).json(User);
+    await Response.save();
+    
+    const User = Response.toJSON();
+    
+    // Generate JWT token
+    const Token = await generateToken(User);
+    if (!Token) {
+      throw "Error generating token.";
+    }
+
+    res.status(200).json({
+      jwt: Token,
+    });
   } catch (error) {
     console.error(error);
     res.status(400).json(error);
@@ -77,6 +91,7 @@ router.post("/login", async (req, res) => {
     if (!email) {
       throw "Email is needed";
     }
+
     if (!password) {
       throw "Password is needed";
     }
@@ -86,6 +101,7 @@ router.post("/login", async (req, res) => {
     if (!Response) {
       throw "User doesn't exist.";
     }
+
     const User = Response.toJSON();
 
     // Compare passwords
@@ -99,6 +115,7 @@ router.post("/login", async (req, res) => {
     if (!Token) {
       throw "Error generating token.";
     }
+
     res.status(200).json({
       jwt: Token,
     });
@@ -126,6 +143,7 @@ router.put("/update/:username", async (req, res) => {
 
     // Query user without password field
     const User = await Collection.findOne({ username }, { password: 0 });
+
     res.status(200).json(User);
   } catch (error) {
     res.status(400).json(error);
@@ -142,6 +160,7 @@ router.delete("/delete/:username", async (req, res) => {
 
     // Delete user
     await Collection.deleteOne({ username });
+
     res.status(200).json("Ok");
   } catch (error) {
     res.status(400).json(error);

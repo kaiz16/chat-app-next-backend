@@ -1,45 +1,68 @@
 const router = require("express").Router();
-const MongoDB = require("../Mongoose");
-const DB = MongoDB.database;
-const Collection = DB.collection("conversation");
+const Collection = require("../Models/CollectionConversation");
+
 router.get("/", async (req, res) => {
   try {
-    // Query conversations
-    const Conversations = await Collection.find({}).toArray();
+    // Query conversations & include relationships
+    const Conversations = await Collection.find({})
+      .populate("creator", { password: 0 })
+      .populate("participants", { password: 0 });
+
     res.status(200).json(Conversations);
   } catch (error) {
+    console.error(error);
+    res.status(400).json("Error querying conversations");
+  }
+});
+
+router.get("/:user_id", async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    // Query conversations & include relationships
+    const Conversations = await Collection.find({
+      participants: { _id: user_id },
+    })
+      .populate("creator", { password: 0 })
+      .populate("participants", { password: 0 });
+
+    res.status(200).json(Conversations);
+  } catch (error) {
+    console.error(error);
     res.status(400).json("Error querying conversations");
   }
 });
 
 router.post("/create", async (req, res) => {
-  const { name, userId, participantIds } = req.body;
-  console.log(name, userId, participantIds);
+  const { name, creator_id, participant_ids } = req.body;
   try {
     // Verifying required fields
     if (!name) {
       throw "Name is needed";
     }
-    if (!userId) {
-      throw "User ID is needed";
+    
+    if (!creator_id) {
+      throw "Creator ID is needed";
     }
 
-    // if (!participantIds) {
-    //   throw "Participant ID is needed";
-    // }
+    if (!participant_ids) {
+      throw "Participant ID(s) are needed";
+    }
+
+    const participantIds = participant_ids
+      .map((id) => {
+        return { _id: id };
+      })
+      .filter(Boolean);
 
     // Store conversation in the db
-    const res = await Collection.insertOne({
+    const Conversation = new Collection({
       name,
-      createdAt: new Date().toUTCString(),
-      userId: userId,
-      //   participantIds: participantIds,
+      participants: participantIds,
+      creator: { _id: creator_id },
     });
 
-    console.log(res);
+    await Conversation.save();
 
-    // Query newly added conversation
-    const Conversation = await Collection.findOne({ _id: insertedId });
     res.status(200).json(Conversation);
   } catch (error) {
     console.error(error);
