@@ -2,6 +2,7 @@ const router = require("express").Router();
 const comparePassword = require("../Helpers/comparePassword");
 const generateToken = require("../Helpers/generateToken");
 const generateHash = require("../Helpers/hashPassword");
+const verifyToken = require("../Middlewares/verifyToken");
 const Collection = require("../Models/CollectionUser");
 
 router.get("/", async (req, res) => {
@@ -12,6 +13,21 @@ router.get("/", async (req, res) => {
     res.status(200).json(Users);
   } catch (error) {
     res.status(400).json("Error querying users");
+  }
+});
+
+router.get("/whoami", verifyToken, async (req, res) => {
+  const { user } = req;
+  try {
+    // Query user without password field
+    const User = await Collection.findOne(
+      { username: user.username },
+      { password: 0 }
+    );
+
+    res.status(200).json(User);
+  } catch (error) {
+    res.status(400).json("Error querying user");
   }
 });
 
@@ -30,6 +46,13 @@ router.get("/:username", async (req, res) => {
   } catch (error) {
     res.status(400).json("Error querying user");
   }
+});
+
+router.post("/verify-token", verifyToken, async (req, res) => {
+  res.status(200).json({
+    name: "JsonWebToken",
+    message: "valid token",
+  });
 });
 
 // Sign up
@@ -65,9 +88,9 @@ router.post("/register", async (req, res) => {
     });
 
     await Response.save();
-    
+
     const User = Response.toJSON();
-    
+
     // Generate JWT token
     const Token = await generateToken(User);
     if (!Token) {
