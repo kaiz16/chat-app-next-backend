@@ -6,13 +6,19 @@ const verifyToken = require("../Middlewares/verifyToken");
 const Collection = require("../Models/CollectionUser");
 
 router.get("/", async (req, res) => {
+  const { search } = req.query;
   try {
     // Query users without password field
-    const Users = await Collection.find({}, { password: 0 });
+    const Users = await Collection.find(
+      {
+        username: new RegExp(search, "i"),
+      },
+      { password: 0 }
+    );
 
     res.status(200).json(Users);
   } catch (error) {
-    res.status(400).json("Error querying users");
+    res.status(400).json(error);
   }
 });
 

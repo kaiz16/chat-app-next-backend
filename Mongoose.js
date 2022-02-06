@@ -6,7 +6,7 @@ class DB {
 
   async Connect() {
     const uri =
-      "mongodb+srv://admin:Admin123@cluster.frb0d.mongodb.net/database?retryWrites=true&w=majority";
+      "mongodb://localhost:27017/chatDB?retryWrites=true&w=majority";
     const connection = await new Promise((resolve, reject) => {
       Mongoose.connect(
         uri,
