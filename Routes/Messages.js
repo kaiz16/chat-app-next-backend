@@ -14,7 +14,7 @@ router.get("/", verifyToken, async (req, res) => {
     res.status(200).json(Messages);
   } catch (error) {
     console.error(error);
-    res.status(400).json("Error querying messages");
+    res.status(400).json(error);
   }
 });
 
@@ -32,7 +32,7 @@ router.get("/:conversation_id", verifyToken, async (req, res) => {
     res.status(200).json(Messages);
   } catch (error) {
     console.error(error);
-    res.status(400).json("Error querying messages");
+    res.status(400).json(error);
   }
 });
 
@@ -41,11 +41,11 @@ router.post("/create", verifyToken, async (req, res) => {
   try {
     // Verifying required fields
     if (!text) {
-      throw "Message is needed";
+      throw "Message is needed.";
     }
 
     if (!conversation_id) {
-      throw "Conversation ID is needed";
+      throw "Conversation ID is needed.";
     }
 
     const senderID = req.user._id;

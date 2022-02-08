@@ -33,7 +33,7 @@ router.get("/whoami", verifyToken, async (req, res) => {
 
     res.status(200).json(User);
   } catch (error) {
-    res.status(400).json("Error querying user");
+    res.status(400).json(error);
   }
 });
 
@@ -42,7 +42,7 @@ router.get("/:username", async (req, res) => {
   try {
     // Verifying required fields
     if (!username) {
-      throw "Username is needed";
+      throw "Username is needed.";
     }
 
     // Query user without password field
@@ -50,7 +50,7 @@ router.get("/:username", async (req, res) => {
 
     res.status(200).json(User);
   } catch (error) {
-    res.status(400).json("Error querying user");
+    res.status(400).json(error);
   }
 });
 
@@ -67,19 +67,19 @@ router.post("/register", async (req, res) => {
   try {
     // Verifying required fields
     if (!name) {
-      throw "Name is needed";
+      throw "Name is needed.";
     }
 
     if (!username) {
-      throw "Username is needed";
+      throw "Username is needed.";
     }
 
     if (!email) {
-      throw "Email is needed";
+      throw "Email is needed.";
     }
 
     if (!password) {
-      throw "Password is needed";
+      throw "Password is needed.";
     }
 
     // Generate hashed password
@@ -107,7 +107,12 @@ router.post("/register", async (req, res) => {
       jwt: Token,
     });
   } catch (error) {
-    console.error(error);
+    if (error && error.code === 11000) {
+      res
+        .status(400)
+        .json(`${Object.keys(error.keyPattern)[0]} already exist.`);
+      return;
+    }
     res.status(400).json(error);
   }
 });
@@ -118,17 +123,17 @@ router.post("/login", async (req, res) => {
   try {
     // Verifying required fields
     if (!email) {
-      throw "Email is needed";
+      throw "Email is needed.";
     }
 
     if (!password) {
-      throw "Password is needed";
+      throw "Password is needed.";
     }
 
     // Find user in the db
     const Response = await Collection.findOne({ email });
     if (!Response) {
-      throw "User doesn't exist.";
+      throw "You don't have an account yet. Please register first.";
     }
 
     const User = Response.toJSON();
@@ -136,7 +141,7 @@ router.post("/login", async (req, res) => {
     // Compare passwords
     const Result = await comparePassword(User.password, password);
     if (!Result) {
-      throw "Password doesn't match.";
+      throw "Wrong password.";
     }
 
     // Generate JWT token
@@ -160,11 +165,11 @@ router.put("/update/:username", async (req, res) => {
   try {
     // Verifying required fields
     if (!name) {
-      throw "Name is needed";
+      throw "Name is needed.";
     }
 
     if (!username) {
-      throw "Username is needed";
+      throw "Username is needed.";
     }
 
     // Update user
@@ -184,7 +189,7 @@ router.delete("/delete/:username", async (req, res) => {
   try {
     // Verifying required fields
     if (!username) {
-      throw "Username is needed";
+      throw "Username is needed.";
     }
 
     // Delete user

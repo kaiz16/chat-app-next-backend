@@ -21,7 +21,7 @@ router.get("/", verifyToken, async (req, res) => {
     res.status(200).json(Conversations);
   } catch (error) {
     console.error(error);
-    res.status(400).json("Error querying conversations");
+    res.status(400).json(error);
   }
 });
 
@@ -30,19 +30,19 @@ router.post("/create", verifyToken, async (req, res) => {
   try {
     // Verifying required fields
     if (!type) {
-      throw "Type is needed";
+      throw "Type is needed.";
     }
 
     if (type !== "Individual" && type !== "Group") {
-      throw "Type must be either Individual or Group";
+      throw "Type must be either Individual or Group.";
     }
 
     if (!name) {
-      throw "Name is needed";
+      throw "Name is needed.";
     }
 
     if (!participant_ids) {
-      throw "Participant ID(s) are needed";
+      throw "Participant ID(s) are needed.";
     }
     const userID = req.user._id;
 
