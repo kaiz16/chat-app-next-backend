@@ -4,6 +4,8 @@ const RoutesUser = require("./Routes/Users");
 const RoutesConversation = require("./Routes/Conversations");
 const RoutesMessage = require("./Routes/Messages");
 const DB = require("./Mongoose");
+const loadEnv = require("./loadEnv");
+loadEnv();
 const App = Express();
 App.use(Express.json());
 App.use(CORS());

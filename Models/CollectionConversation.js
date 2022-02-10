@@ -1,5 +1,4 @@
 const Mongoose = require("mongoose");
-const CollectionMessage = require("../Models/CollectionMessage");
 
 const Conversation = Mongoose.model(
   "conversations",

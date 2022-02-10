@@ -8,7 +8,7 @@ const generateToken = async (user) => {
   const signedJWT = await new Promise((resolve, reject) => {
     JWT.sign(
       user,
-      "123456",
+      process.env.JWT_SECRET,
       { expiresIn: "3h" },
       (err, token) => {
         if (err) reject(err);

@@ -107,6 +107,7 @@ router.post("/register", async (req, res) => {
       jwt: Token,
     });
   } catch (error) {
+    console.log(error);
     if (error && error.code === 11000) {
       res
         .status(400)
