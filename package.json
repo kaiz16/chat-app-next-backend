@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
+    "start:dev": "nodemon NODE_ENV=development index.js",
+    "start": "nodemon NODE_ENV=production index.js",
     "collection:create": "node Models/CreateCollection.js",
     "collection:drop": "node Models/DropCollection.js"
   },
