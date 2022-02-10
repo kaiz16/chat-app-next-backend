@@ -14,7 +14,7 @@ const start = async () => {
   App.use("/users", RoutesUser);
   App.use("/conversations", RoutesConversation);
   App.use("/messages", RoutesMessage);
-  App.listen(5000, () => {
+  App.listen(process.env.PORT || 5000, () => {
     console.log(`🚀 Listening on port 5000`);
   });
   // await Server.close();
